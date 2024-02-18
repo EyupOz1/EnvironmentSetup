@@ -12,7 +12,7 @@ sudo apt -qq -y update
 sudo apt -qq -y upgrade
 
 # Install basic packages
-packages=("git" "build-essential" "ripgrep" "unzip" "fd-find")
+packages=("git" "build-essential" "ripgrep" "unzip" "fd-find" "lazygit")
 
 for element in "${packages[@]}"; do
 	out "Installing $element"
