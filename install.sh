@@ -36,5 +36,6 @@ rm lazygit
 
 out "NVVVVIIIIMMM"
 curl -LO https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
+chmod u+x nvim.appimage
 sudo ./nvim.appimage --appimage-extract
 sudo mv squashfs-root/usr/bin/nvim /usr/bin/ 
