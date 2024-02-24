@@ -38,4 +38,5 @@ out "NVVVVIIIIMMM"
 curl -LO https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
 chmod u+x nvim.appimage
 sudo ./nvim.appimage --appimage-extract
-sudo mv squashfs-root/usr/bin/nvim /usr/bin/ 
+sudo mv squashfs-root /
+sudo ln -s /squashfs-root/AppRun /usr/bin/nvim
