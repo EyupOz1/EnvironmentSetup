@@ -40,3 +40,7 @@ chmod u+x nvim.appimage
 sudo ./nvim.appimage --appimage-extract
 sudo mv squashfs-root /
 sudo ln -s /squashfs-root/AppRun /usr/bin/nvim
+
+out "Dont forget to set git config"
+out 'git config --global user.name "John Doe"'
+out 'git config --global user.email "johndoe@example.com"'
