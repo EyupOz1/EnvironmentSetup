@@ -16,7 +16,6 @@ vim.g.mapleader = " "
 require("lazy").setup("config")
 
 
-require("keymaps").setKeymaps()
-require("keymaps").setTelescopeKeymaps()
-require("settings").applySettings()
-require("keymaps").setGitKeymaps()
+
+require("settings")
+require("keymaps")

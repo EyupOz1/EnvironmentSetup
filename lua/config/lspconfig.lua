@@ -16,7 +16,6 @@ return {
 				ensure_installed = {
 					"lua_ls",
 					"tsserver",
-					"stylua",
 					"clangd",
 					"html",
 					"htmx",
@@ -24,7 +23,8 @@ return {
 				handlers = {
 					function(server_name) -- default handler (optional)
 						require("lspconfig")[server_name].setup({
-							capabilities = capabilities
+							capabilities = capabilities,
+
 
 						})
 					end,
@@ -36,6 +36,9 @@ return {
 									diagnostics = {
 										globals = { "vim" },
 									},
+									completion = {
+										callSnippet = "Replace"
+									}
 								},
 							},
 						})
