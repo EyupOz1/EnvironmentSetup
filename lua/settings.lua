@@ -21,3 +21,4 @@ vim.cmd("set nowrap")
 vim.cmd("set number")
 vim.cmd("set relativenumber")
 vim.opt.wrap = false
+vim.opt.termguicolors = true
