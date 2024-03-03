@@ -11,7 +11,7 @@ sudo apt -qq -y update
 sudo apt -qq -y upgrade
 
 # Install basic packages
-packages=("git" "build-essential" "ripgrep" "unzip" "fd-find" "lazygit" "curl" "tar")
+packages=("git" "build-essential" "ripgrep" "unzip" "fd-find" "lazygit" "curl" "stow" "tar")
 
 for element in "${packages[@]}"; do
 	out "Installing $element"
@@ -24,7 +24,6 @@ sudo bash /tmp/nodesource_setup.sh && sudo apt-get -q install nodejs -y
 node -v
 npm -v
 
-
 out "Installing lazygit"
 LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
 curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
@@ -35,7 +34,7 @@ rm lazygit
 
 
 
-out "NVIM"
+out "NVVVVIIIIMMM"
 curl -LO https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
 chmod u+x nvim.appimage
 sudo ./nvim.appimage --appimage-extract
