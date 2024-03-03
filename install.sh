@@ -24,6 +24,7 @@ sudo bash /tmp/nodesource_setup.sh && sudo apt-get -q install nodejs -y
 node -v
 npm -v
 
+
 out "Installing lazygit"
 LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
 curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
@@ -34,12 +35,14 @@ rm lazygit
 
 
 
-out "NVVVVIIIIMMM"
+out "NVIM"
 curl -LO https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
 chmod u+x nvim.appimage
 sudo ./nvim.appimage --appimage-extract
 sudo mv squashfs-root /
 sudo ln -s /squashfs-root/AppRun /usr/bin/nvim
+
+
 
 out "Dont forget to set git config"
 out 'git config --global user.name "John Doe"'
