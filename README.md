@@ -1,3 +1,3 @@
 ```
-git clone https://github.com/Ayyubi3/dotfiles ~/ && sudo bash ~/dotfiles/.install
+git clone https://github.com/Ayyubi3/dotfiles ~/.dotfiles && sudo bash ~/.dotfiles/.install
 ```
