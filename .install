@@ -41,6 +41,7 @@ sudo ./nvim.appimage --appimage-extract
 sudo mv squashfs-root /
 sudo ln -s /squashfs-root/AppRun /usr/bin/nvim
 
+sudo rm ~/nvim.appimag*
 
 
 out "Dont forget to set git config"
