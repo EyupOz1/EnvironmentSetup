@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd ~
+
 function out() {
 	GREEN='\033[0;32m'
 	RESET='\033[0m'
@@ -41,8 +43,9 @@ sudo ./nvim.appimage --appimage-extract
 sudo mv squashfs-root /
 sudo ln -s /squashfs-root/AppRun /usr/bin/nvim
 
-sudo rm ~/nvim.appimag*
+sudo rm nvim.appimage
 
+out "install JetBrainsMonoNerdFont"
 
 out "Dont forget to set git config"
 out 'git config --global user.name "John Doe"'
