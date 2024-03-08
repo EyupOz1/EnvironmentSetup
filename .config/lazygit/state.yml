@@ -1,7 +1,9 @@
 lastupdatecheck: 0
 recentrepos:
 - /home/ayyubi/.dotfiles
+- /home/ayyubi/nvimplugins/cheatsheet.nvim
 startuppopupversion: 5
-customcommandshistory: []
+customcommandshistory:
+- q
 hidecommandlog: false
 ignorewhitespaceindiffview: false
