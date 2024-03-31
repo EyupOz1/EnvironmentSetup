@@ -1,5 +1,10 @@
 if cursor is on arguments of function, hover doesnt work anymore, hover should stay if in function args
 keymap to quit fast
-change completion frm ctrl y to tab 
 button to change to previous buffer
 function im writing get blacked out, stop that
+
+
+
+
+Done
+change completion frm ctrl y to tab 
