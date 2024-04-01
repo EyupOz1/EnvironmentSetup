@@ -17,4 +17,3 @@ require("lazy").setup("config")
 
 require("settings")
 require("keymaps")
-

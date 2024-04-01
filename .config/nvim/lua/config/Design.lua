@@ -1,4 +1,3 @@
---TODO
 return {
 	{
 		"folke/tokyonight.nvim",
@@ -18,6 +17,9 @@ return {
 			require("lualine").setup({
 				options = {
 					theme = "tokyonight",
+				},
+				sections = {
+					lualine_x = { "vim.fn.getcwd()" },
 				},
 			})
 		end,

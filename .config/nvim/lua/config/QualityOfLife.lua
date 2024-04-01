@@ -19,4 +19,9 @@ return {
 			vim.keymap.set("n", "<leader>todo", ":TodoTrouble")
 		end,
 	},
+	{
+		"m4xshen/hardtime.nvim",
+		dependencies = { "MunifTanjim/nui.nvim", "nvim-lua/plenary.nvim" },
+		opts = {},
+	},
 }
