@@ -1,52 +1,101 @@
 #!/bin/bash
+set -e
 
-cd ~
+export DEBIAN_FRONTEND=noninteractive
 
-function out() {
-	GREEN='\033[0;32m'
-	RESET='\033[0m'
-	echo -e "${GREEN}$1${RESET}"
+# Use sudo only if not root
+SUDO=''
+if [ "$EUID" -ne 0 ]; then
+    SUDO='sudo'
+fi
+
+log() {
+    echo -e "\033[1;32m[INFO]\033[0m $1"
 }
 
-out "Update/Upgrade"
-sudo apt -qq -y update
-sudo apt -qq -y upgrade
+# Ensure we are in the home directory
+if [ "$PWD" != "$HOME" ]; then
+    log "Changing to home directory (~)..."
+    cd "$HOME"
+fi
+
+# Detect distro
+if [ -f /etc/debian_version ]; then
+    DISTRO="debian"
+else
+    echo "[ERROR] Unsupported distro for now."
+    exit 1
+fi
+
+log "Detected distro: $DISTRO"
+
+# Update system
+log "Updating system..."
+$SUDO apt-get update && $SUDO apt-get upgrade -y
 
 # Install basic packages
-packages=("git" "build-essential" "ripgrep" "unzip" "fd-find" "lazygit" "curl" "stow" "tar")
+log "Installing basic packages..."
+$SUDO apt-get install -y curl wget git build-essential stow luarocks
 
-for element in "${packages[@]}"; do
-	out "Installing $element"
-	sudo apt-get -q -y install "$element"
-done
+# Check Python & Pip
+if command -v python3 >/dev/null 2>&1; then
+    log "Python already installed: $(python3 --version)"
+else
+    log "Installing Python..."
+    $SUDO apt-get install -y python3 python3-venv python3-pip
+fi
 
-out "installing node"
-curl -sL https://deb.nodesource.com/setup_20.x -o /tmp/nodesource_setup.sh
-sudo bash /tmp/nodesource_setup.sh && sudo apt-get -q install nodejs -y
-node -v
-npm -v
+if command -v pip3 >/dev/null 2>&1; then
+    log "Pip already installed: $(pip3 --version)"
+else
+    log "Installing pip..."
+    $SUDO apt-get install -y python3-pip
+fi
 
-out "Installing lazygit"
-LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "v\K[^"]*')
-curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/latest/download/lazygit_${LAZYGIT_VERSION}_Linux_x86_64.tar.gz"
-tar xf lazygit.tar.gz lazygit
-sudo install lazygit /usr/local/bin
-rm lazygit.tar.gz
-rm lazygit
+# Check Node.js
+if command -v node >/dev/null 2>&1; then
+    log "Node.js already installed: $(node -v)"
+else
+    log "Installing Node.js..."
+    curl -fsSL https://deb.nodesource.com/setup_lts.x | $SUDO -E bash -
+    $SUDO apt-get install -y nodejs
+fi
 
+# Check npm
+if command -v npm >/dev/null 2>&1; then
+    log "npm already installed: $(npm -v)"
+else
+    log "Installing npm (comes with Node.js)..."
+    $SUDO apt-get install -y npm
+fi
 
+# Install lazygit
+if command -v lazygit >/dev/null 2>&1; then
+    log "Lazygit already installed: $(lazygit --version)"
+else
+    log "Installing Lazygit..."
+    LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
+    if [ -z "$LAZYGIT_VERSION" ]; then
+        echo "[ERROR] Could not fetch Lazygit version."
+        exit 1
+    fi
+    curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION#v}_Linux_x86_64.tar.gz"
+    tar xf lazygit.tar.gz lazygit
+    $SUDO install lazygit /usr/local/bin
+    rm lazygit lazygit.tar.gz
+fi
 
-out "NVVVVIIIIMMM"
-curl -LO https://github.com/neovim/neovim/releases/download/nightly/nvim.appimage
-chmod u+x nvim.appimage
-sudo ./nvim.appimage --appimage-extract
-sudo mv squashfs-root /
-sudo ln -s /squashfs-root/AppRun /usr/bin/nvim
+# Install Neovim via official PPA
+if command -v nvim >/dev/null 2>&1; then
+    log "Neovim already installed: $(nvim --version | head -n 1)"
+else
+    log "Installing Neovim (stable PPA)..."
+    $SUDO apt-get install -y software-properties-common lsb-release gnupg
+    $SUDO add-apt-repository -y ppa:neovim-ppa/unstable
+    $SUDO apt-get update
+    $SUDO apt-get install -y neovim
+fi
 
-sudo rm nvim.appimage
+log "Setup complete! Python, Node.js, npm, Lazygit, and Neovim are installed."
 
-out "install JetBrainsMonoNerdFont"
-
-out "Dont forget to set git config"
-out 'git config --global user.name "John Doe"'
-out 'git config --global user.email "johndoe@example.com"'
+# https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.zip

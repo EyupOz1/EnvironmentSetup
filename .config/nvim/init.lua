@@ -1,19 +1,16 @@
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-if not vim.loop.fs_stat(lazypath) then
-	vim.fn.system({
-		"git",
-		"clone",
-		"--filter=blob:none",
-		"https://github.com/folke/lazy.nvim.git",
-		"--branch=stable", -- latest stable release
-		lazypath,
-	})
-end
-vim.opt.rtp:prepend(lazypath)
+--  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
+vim.g.mapleader = ' '
+vim.g.maplocalleader = ' '
 
-require("lazy").setup("config")
+vim.g.have_nerd_font = true
 
-require("settings")
-require("keymaps")
+require 'options'
+
+require 'keymaps'
+
+require 'lazy-bootstrap'
+
+require 'lazy-plugins'
+
+-- The line beneath this is called `modeline`. See `:help modeline`
+-- vim: ts=2 sts=2 sw=2 et
