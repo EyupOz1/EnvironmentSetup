@@ -1,101 +1,69 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+# -----------------------------------------------------------------------------
+# Minimal developer setup script (Ubuntu / KDE neon / Debian-based)
+#
+# - Updates system
+# - Installs base packages: curl, git, Python3 + pip, Node.js LTS, Lazygit
+# - Installs Neovim v0.10.x (stable PPA: ppa:neovim-ppa/stable)
+#
+# Run with: sudo bash setup.sh
+# -----------------------------------------------------------------------------
 
+set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
-# Use sudo only if not root
-SUDO=''
-if [ "$EUID" -ne 0 ]; then
-    SUDO='sudo'
+# --- helpers ----------------------------------------------------------------
+log() { echo -e "\033[1;32m[INFO]\033[0m $*"; }
+
+# --- system update ----------------------------------------------------------
+log "Updating package lists and upgrading..."
+apt-get update -y
+apt-get dist-upgrade -y
+
+# --- base packages ----------------------------------------------------------
+log "Installing basic tools..."
+apt-get install -y curl wget git build-essential ca-certificates gnupg lsb-release software-properties-common
+
+# --- Python -----------------------------------------------------------------
+if ! command -v python3 >/dev/null 2>&1; then
+  apt-get install -y python3 python3-venv python3-pip
 fi
+log "Python: $(python3 --version)"
 
-log() {
-    echo -e "\033[1;32m[INFO]\033[0m $1"
-}
-
-# Ensure we are in the home directory
-if [ "$PWD" != "$HOME" ]; then
-    log "Changing to home directory (~)..."
-    cd "$HOME"
+if ! command -v pip3 >/dev/null 2>&1; then
+  apt-get install -y python3-pip
 fi
+log "Pip: $(pip3 --version)"
 
-# Detect distro
-if [ -f /etc/debian_version ]; then
-    DISTRO="debian"
-else
-    echo "[ERROR] Unsupported distro for now."
-    exit 1
+# --- Node.js (NodeSource LTS) -----------------------------------------------
+if ! command -v node >/dev/null 2>&1; then
+  log "Installing Node.js LTS..."
+  curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
+  apt-get install -y nodejs
 fi
+log "Node: $(node -v), npm: $(npm -v)"
 
-log "Detected distro: $DISTRO"
-
-# Update system
-log "Updating system..."
-$SUDO apt-get update && $SUDO apt-get upgrade -y
-
-# Install basic packages
-log "Installing basic packages..."
-$SUDO apt-get install -y curl wget git build-essential stow luarocks
-
-# Check Python & Pip
-if command -v python3 >/dev/null 2>&1; then
-    log "Python already installed: $(python3 --version)"
-else
-    log "Installing Python..."
-    $SUDO apt-get install -y python3 python3-venv python3-pip
+# --- Lazygit (latest release) ----------------------------------------------
+if ! command -v lazygit >/dev/null 2>&1; then
+  log "Installing Lazygit..."
+  tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+  ver="$(curl -fsSL https://api.github.com/repos/jesseduffield/lazygit/releases/latest \
+         | grep -Po '"tag_name":\s*"\K[^"]+')"
+  curl -fsSL -o "$tmp/lg.tgz" \
+    "https://github.com/jesseduffield/lazygit/releases/download/${ver}/lazygit_${ver#v}_Linux_x86_64.tar.gz"
+  tar -C "$tmp" -xf "$tmp/lg.tgz" lazygit
+  install "$tmp/lazygit" /usr/local/bin/lazygit
 fi
+log "Lazygit: $(lazygit --version | head -n1)"
 
-if command -v pip3 >/dev/null 2>&1; then
-    log "Pip already installed: $(pip3 --version)"
-else
-    log "Installing pip..."
-    $SUDO apt-get install -y python3-pip
+# --- Neovim (stable PPA) ----------------------------------------------------
+if ! command -v nvim >/dev/null 2>&1; then
+  log "Installing Neovim (stable PPA)..."
+  sudo apt-get update && sudo apt-get install -y snapd
+  sudo snap install nvim --classic
+  nvim --version | head -n1
 fi
+log "Neovim: $(nvim --version | head -n1)"
 
-# Check Node.js
-if command -v node >/dev/null 2>&1; then
-    log "Node.js already installed: $(node -v)"
-else
-    log "Installing Node.js..."
-    curl -fsSL https://deb.nodesource.com/setup_lts.x | $SUDO -E bash -
-    $SUDO apt-get install -y nodejs
-fi
-
-# Check npm
-if command -v npm >/dev/null 2>&1; then
-    log "npm already installed: $(npm -v)"
-else
-    log "Installing npm (comes with Node.js)..."
-    $SUDO apt-get install -y npm
-fi
-
-# Install lazygit
-if command -v lazygit >/dev/null 2>&1; then
-    log "Lazygit already installed: $(lazygit --version)"
-else
-    log "Installing Lazygit..."
-    LAZYGIT_VERSION=$(curl -s "https://api.github.com/repos/jesseduffield/lazygit/releases/latest" | grep -Po '"tag_name": "\K.*?(?=")')
-    if [ -z "$LAZYGIT_VERSION" ]; then
-        echo "[ERROR] Could not fetch Lazygit version."
-        exit 1
-    fi
-    curl -Lo lazygit.tar.gz "https://github.com/jesseduffield/lazygit/releases/download/${LAZYGIT_VERSION}/lazygit_${LAZYGIT_VERSION#v}_Linux_x86_64.tar.gz"
-    tar xf lazygit.tar.gz lazygit
-    $SUDO install lazygit /usr/local/bin
-    rm lazygit lazygit.tar.gz
-fi
-
-# Install Neovim via official PPA
-if command -v nvim >/dev/null 2>&1; then
-    log "Neovim already installed: $(nvim --version | head -n 1)"
-else
-    log "Installing Neovim (stable PPA)..."
-    $SUDO apt-get install -y software-properties-common lsb-release gnupg
-    $SUDO add-apt-repository -y ppa:neovim-ppa/unstable
-    $SUDO apt-get update
-    $SUDO apt-get install -y neovim
-fi
-
-log "Setup complete! Python, Node.js, npm, Lazygit, and Neovim are installed."
-
-# https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/JetBrainsMono.zip
+# --- done -------------------------------------------------------------------
+log "Setup complete! Tools installed: Python, Node.js, npm, Lazygit, Neovim (stable)."
